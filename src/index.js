@@ -21,7 +21,11 @@ class Card extends React.Component {
                 <div className="extra content">
                     <a onClick={() => this.props.toogleLike(this.props.email)}>
                         <i className="user icon" />
-                        Like
+                        {
+                            this.props.liked
+                            ? 'liked'
+                            : 'like'
+                        }
                     </a>
                 </div>
             </div>
@@ -34,7 +38,7 @@ class App extends React.Component {
         super(props);
         this.state = {
             users: [],
-            likeIds: []
+            likedIds: []
         }
         this.renderList = this.renderList.bind(this);
         this.toogleLike = this.toogleLike.bind(this);
@@ -52,7 +56,17 @@ class App extends React.Component {
     }
 
     toogleLike(userEmail) {
-        console.log(userEmail)
+        const { likedIds } = this.state;
+        const isLiked = likedIds.find((email) => email === userEmail);
+        if(isLiked) {
+            this.setState({
+                likedIds: likedIds.filter(email => email !== userEmail)
+            })
+        } else {
+            this.setState({
+                likedIds: likedIds.concat(userEmail)
+            })
+        }
     }
 
     renderList() {
@@ -66,6 +80,7 @@ class App extends React.Component {
                     key={user.email}
                     email={user.email}
                     toogleLike={this.toogleLike}
+                    liked={this.state.likedIds.find(email => email === user.email)}
                 />
             )
         })
