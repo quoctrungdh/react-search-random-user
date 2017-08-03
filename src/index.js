@@ -37,22 +37,57 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            page: 1,
             users: [],
             likedIds: []
         }
         this.renderList = this.renderList.bind(this);
         this.toogleLike = this.toogleLike.bind(this);
+        this.getUsers = this.getUsers.bind(this);
+        this.scrollHandle = this.scrollHandle.bind(this);
+        this.isPartiallyVisible = this.isPartiallyVisible.bind(this);
+    }
+
+    getUsers() {
+        const { page, users } = this.state;
+        return fetch(`https://randomuser.me/api/?results=10&page=${page}`, {
+            method: 'get'
+        })
+        .then(res => res.json())
+        .then(res => {
+            this.setState({
+                users: page === 1 ? res.results : [...users, ...res.results]
+            })
+        })
+    }
+
+    isPartiallyVisible(element) {
+        const elementBoudary = element.getBoundingClientRect();
+        const { top } = elementBoudary;
+        const innerHeight = window.innerHeight;
+        return innerHeight > top;
+    }
+
+    scrollHandle() {
+        const isBottom = this.isPartiallyVisible(this.endTrigger);
+        if (isBottom) {
+            this.setState({
+                page: this.state.page + 1
+            }, () => {
+                this.getUsers();
+            });
+        }
     }
 
     componentDidMount() {
-        fetch('https://randomuser.me/api/?results=10', {
-            method: 'get'
-        }).then(res => res.json())
-        .then(res => {
-            this.setState({
-                users: res.results
-            })
-        })
+        this.endTrigger = document.getElementById('end');
+        window.addEventListener('mousewheel', (e) => {
+            if (e.deltaY > 0) {
+                // scroll DOWN only
+                this.scrollHandle();
+            }
+        });
+        this.getUsers();
     }
 
     toogleLike(userEmail) {
@@ -95,6 +130,7 @@ class App extends React.Component {
                     ? this.renderList()
                     : <p>Loading...</p>
                 }
+                <div id='end' />
             </div>
         )
     }

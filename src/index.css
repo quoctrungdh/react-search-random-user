@@ -6,3 +6,7 @@
 .ui.card {
     margin: 1rem auto;
 }
+
+#end {
+    height: 20px;
+}
