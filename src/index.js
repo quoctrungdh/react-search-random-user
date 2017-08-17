@@ -17,6 +17,7 @@ class Card extends React.Component {
                     <div className="description">
                         {this.props.description}
                     </div>
+                    <p>{this.props.email}</p>
                 </div>
                 <div className="extra content">
                     <a onClick={() => this.props.toogleLike(this.props.email)}>
@@ -39,13 +40,15 @@ class App extends React.Component {
         this.state = {
             page: 1,
             users: [],
-            likedIds: []
+            likedIds: [],
+            filterText: ''
         }
         this.renderList = this.renderList.bind(this);
         this.toogleLike = this.toogleLike.bind(this);
         this.getUsers = this.getUsers.bind(this);
         this.scrollHandle = this.scrollHandle.bind(this);
         this.isPartiallyVisible = this.isPartiallyVisible.bind(this);
+        this.changeFilter = this.changeFilter.bind(this);
     }
 
     getUsers() {
@@ -105,7 +108,13 @@ class App extends React.Component {
     }
 
     renderList() {
-        return this.state.users.map(user => {
+        const { filterText } = this.state;
+        const filterByGender = (user) => {
+            return filterText.length === 0 || (user.email).indexOf(filterText) !== -1
+        }
+        const filteredValues = this.state.users
+            .filter(filterByGender);
+        return filteredValues.map(user => {
             return (
                 <Card
                     img={user.picture.large}
@@ -121,10 +130,22 @@ class App extends React.Component {
         })
     }
 
+    changeFilter({ target }) {
+        const { value } = target;
+        this.setState({
+            filterText: value
+        })
+    }
+
     render() {
         const { users } = this.state;
         return (
             <div className="container">
+                <input
+                    type="text"
+                    onChange={this.changeFilter}
+                    placeholder="Type to search..."
+                />
                 {
                     users.length > 0
                     ? this.renderList()
