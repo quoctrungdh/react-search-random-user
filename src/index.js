@@ -141,11 +141,17 @@ class App extends React.Component {
         const { users } = this.state;
         return (
             <div className="container">
-                <input
-                    type="text"
-                    onChange={this.changeFilter}
-                    placeholder="Type to search..."
-                />
+                <div className="ui search search-wrapper">
+                    <div className="ui icon input">
+                        <input
+                            className="prompt"
+                            type="text"
+                            onChange={this.changeFilter}
+                            placeholder="Type to search..."
+                        />
+                        <i className="search icon" />
+                    </div>
+                </div>
                 {
                     users.length > 0
                     ? this.renderList()
